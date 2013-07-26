@@ -49,6 +49,7 @@ class Configuration(object):
                     "ec2_access_key": "***fill in your data here***",
                     "ec2_secret_key": "***fill in your data here***",
                     "ec2_region": "nova",
+                    "ec2_validate_certs": False,
                     },
                 "login": {
                     "image_user": "gc3-user",
@@ -70,6 +71,7 @@ class Configuration(object):
                         "security_group": "default",
                         "flavor": "m1.tiny",
                         "image_id": "ami-00000048",
+                        "availability_zone": None,
                         },
                     "compute": {
                         "security_group": "default",
@@ -308,6 +310,7 @@ class TestConfigReader(unittest.TestCase):
             ec2_access_key=****REPLACE WITH YOUR ACCESS ID****
             ec2_secret_key=****REPLACE WITH YOUR SECRET KEY****
             ec2_region=nova
+            ec2_validate_certs=False
 
             [cloud/amazon-us-east-1]
             provider=ec2_boto
@@ -315,6 +318,7 @@ class TestConfigReader(unittest.TestCase):
             ec2_access_key=****REPLACE WITH YOUR ACCESS ID****
             ec2_secret_key=****REPLACE WITH YOUR SECRET KEY****
             ec2_region=us-east-1
+            ec2_validate_certs=False
 
             [login/ubuntu]
             image_user=ubuntu
@@ -362,6 +366,7 @@ class TestConfigReader(unittest.TestCase):
             frontend_nodes=1
             compute_nodes=2
             frontend_class=frontend
+            availability_zone=None
 
             [cluster/torque]
             cloud=hobbes
@@ -374,6 +379,7 @@ class TestConfigReader(unittest.TestCase):
             flavor=m1.small
             login=gc3-user
             setup_provider=ansible-pbs
+            availability_zone=None
 
             [cluster/aws-slurm]
             cloud=amazon-us-east-1
@@ -385,6 +391,7 @@ class TestConfigReader(unittest.TestCase):
             flavor=m1.small
             frontend=1
             compute=2
+            availability_zone=None
 
             [cluster/matlab]
             cloud=hobbes
@@ -397,6 +404,7 @@ class TestConfigReader(unittest.TestCase):
             worker_nodes=10
             image_userdata=
             ssh_to=frontend
+            availability_zone=None
 
             [cluster/slurm/frontend]
             flavor=bigdisk
@@ -467,6 +475,7 @@ class TestConfigReader(unittest.TestCase):
             ec2_access_key=****REPLACE WITH YOUR ACCESS ID****
             ec2_secret_key=****REPLACE WITH YOUR SECRET KEY****
             ec2_region=nova
+            ec2_validate_certs=False
 
             [login/gc3-user]
             image_user=gc3-user
@@ -492,5 +501,6 @@ class TestConfigReader(unittest.TestCase):
             frontend_nodes=1
             compute_nodes=2
             frontend_class=frontend
+            availability_zone=None
             """
         self.assertRaises(MultipleInvalid, self._check_read_config, config)

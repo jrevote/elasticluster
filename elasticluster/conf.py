@@ -197,7 +197,8 @@ class Configurator(object):
                     conf_login["user_key_private"],
                     conf_login['user_key_name'],
                     conf_login['image_user'], conf['security_group'],
-                    conf['image_id'], conf['flavor'],
+                    conf['image_id'], conf['flavor'], 
+                    conf['availability_zone'],
                     image_userdata=conf.get('image_userdata', ''))
 
     def create_cluster_storage(self):
@@ -313,6 +314,7 @@ class ConfigValidator(object):
                             "ec2_access_key": All(str, Length(min=1)),
                             "ec2_secret_key": All(str, Length(min=1)),
                             "ec2_region": All(str, Length(min=1)),
+                            "ec2_validate_certs": Boolean(str),
                             },
                   "cluster": {"cloud": All(str, Length(min=1)),
                               "setup_provider": All(str, Length(min=1)),
@@ -333,7 +335,8 @@ class ConfigValidator(object):
         node_schema = {
             "flavor": All(str, Length(min=1)),
             "image_id": All(str, Length(min=1)),
-            "security_group": All(str, Length(min=1))
+            "security_group": All(str, Length(min=1)),
+            "availability_zone": All(str, Length(min=1))
         }
 
         # validation

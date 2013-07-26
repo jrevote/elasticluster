@@ -414,7 +414,7 @@ class Node(object):
 
     def __init__(self, name, node_type, cloud_provider, user_key_public,
                  user_key_private, user_key_name, image_user, security_group,
-                 image, flavor, image_userdata=None):
+                 image, flavor, availability_zone, image_userdata=None):
         self.name = name
         self.type = node_type
         self._cloud_provider = cloud_provider
@@ -426,6 +426,7 @@ class Node(object):
         self.image = image
         self.image_userdata = image_userdata
         self.flavor = flavor
+        self.availability_zone = availability_zone
 
         self.instance_id = None
         self.ip_public = None
@@ -441,7 +442,8 @@ class Node(object):
         self.instance_id = self._cloud_provider.start_instance(
             self.user_key_name, self.user_key_public, self.user_key_private,
             self.security_group,
-            self.flavor, self.image, self.image_userdata)
+            self.flavor, self.image, self.image_userdata,
+            self.availability_zone)
         log.debug("Node %s has instance_id: `%s`", self.name, self.instance_id)
 
     def stop(self):

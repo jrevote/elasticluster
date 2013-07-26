@@ -23,9 +23,10 @@ import urllib
 
 # External modules
 import boto
-from boto import ec2
+from boto import ec2, config
 from paramiko import DSSKey, RSAKey, PasswordRequiredException
 from paramiko.ssh_exception import SSHException
+from voluptuous import Boolean
 
 # Elasticluster imports
 from elasticluster import log
@@ -40,11 +41,18 @@ class BotoCloudProvider(AbstractCloudProvider):
     the virtual instances
     """
 
-    def __init__(self, ec2_url, ec2_region, ec2_access_key, ec2_secret_key):
+    def __init__(self, ec2_url, ec2_region, ec2_access_key, ec2_secret_key, 
+                 ec2_validate_certs):
         self._url = ec2_url
         self._region_name = ec2_region
         self._access_key = ec2_access_key
         self._secret_key = ec2_secret_key
+        ec2_validate_certs = ec2_validate_certs.lower()
+
+        if ec2_validate_certs in ('1', 'true', 'yes', 'on', 'enable'):
+            self._validate_certs = True 
+        else:
+            self._validate_certs = False
 
         # read all parameters from url
         proto, opaqueurl = urllib.splittype(ec2_url)
@@ -86,7 +94,8 @@ class BotoCloudProvider(AbstractCloudProvider):
                 aws_secret_access_key=self._secret_key,
                 is_secure=self._secure,
                 host=self._ec2host, port=self._ec2port,
-                path=self._ec2path, region=region)
+                path=self._ec2path, region=region, 
+                validate_certs=self._validate_certs)
 
             # list images to see if the connection works
             log.debug("Connection has been successful.")
@@ -102,7 +111,8 @@ class BotoCloudProvider(AbstractCloudProvider):
         return self._connection
 
     def start_instance(self, key_name, public_key_path, private_key_path,
-                       security_group, flavor, image_id, image_userdata):
+                       security_group, flavor, image_id, image_userdata,
+                       availability_zone):
         """
         Starts an instance in the cloud on the specified cloud
         provider (configuration option) and returns the id of the
@@ -119,7 +129,8 @@ class BotoCloudProvider(AbstractCloudProvider):
         try:
             reservation = connection.run_instances(
                 image_id, key_name=key_name, security_groups=[security_group],
-                instance_type=flavor, user_data=image_userdata)
+                instance_type=flavor, user_data=image_userdata,
+                placement=availability_zone)
         except Exception, ex:
             log.error("Error starting instance: %s", ex)
             raise InstanceError(ex)
